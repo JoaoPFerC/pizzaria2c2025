@@ -1,21 +1,23 @@
+//Hooks do react - estado dos dados e rendenização
 import { useState, useEffect } from "react";
+//ferramenta de consumo das rotas ou endpoints
 import axios from "axios";
 
 // Formulário simples em JavaScript usando apenas <div>, <input>, useState/useEffect e axios
 const CadastroProduto = () => {
+  //Eestado que mantém os dados do produto em memória
   const [form, setForm] = useState({
     nome: "",
-    descricao: "",
     tipo: "",
-    preco: "",
-    categoriaId: "",
+    precoVenda: "",
+    descricao: ""
   });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    if (form.preco.includes(",")) {
-      setForm((f) => ({ ...f, preco: f.preco.replace(",", ".") }));
+    if (form.precoVenda.includes(",")) {
+      setForm((f) => ({ ...f, precoVenda: f.precoVenda.replace(",", ".") }));
     }
   }, [form.preco]);
 
@@ -28,20 +30,28 @@ const CadastroProduto = () => {
     setMsg("");
     const payload = {
       nome: form.nome,
-      descricao: form.descricao,
       tipo: form.tipo,
-      preco: Number(form.preco),
-      categoriaId: parseInt(form.categoriaId, 10),
+      precoVenda: Number(form.precoVenda),
+      descricao: form.descricao     
     };
 
-    if (!payload.nome || !payload.descricao || !payload.tipo || !payload.preco || !payload.categoriaId) {
+    if (!payload.nome || !payload.descricao || !payload.tipo || !payload.precoVenda) {
       setMsg("Preencha todos os campos corretamente.");
       return;
     }
 
     setLoading(true);
     try {
-      axios.post("http://172.19.0.49/pizzariateste/api/v1/produto", payload)
+      axios.post("http://172.19.0.49/pizzariateste/api/v1/produto", 
+        payload,
+        {
+          mode: "no-cors",
+          headers: {
+            "Accept":"*",
+            "Content-Type": "application/json"
+          }
+        }
+      )
       .then(response => {
         console.log(response.data);
       })
@@ -49,7 +59,7 @@ const CadastroProduto = () => {
         console.log(error);
       });
       setMsg("Produto cadastrado com sucesso.");
-      setForm({ nome: "", descricao: "", tipo: "", preco: "", categoriaId: "" });
+      setForm({ nome: "", tipo: "", precoVenda: "", descricao: ""});
     } catch (err) {
       const texto = err?.response?.data?.message || err?.message || "Falha ao cadastrar.";
       setMsg(texto);
@@ -93,9 +103,9 @@ const CadastroProduto = () => {
 
       <div>
         <input
-          name="preco"
+          name="precoVenda"
           placeholder="Preço (ex.: 199.90)"
-          value={form.preco}
+          value={form.precoVenda}
           onChange={onChange}
         />
       </div>
